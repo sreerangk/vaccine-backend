@@ -12,7 +12,7 @@ class AshaWorkerAmin(admin.ModelAdmin):
 admin.site.register(AshaWorker, AshaWorkerAmin)
 class AnmDetailsAdmin(admin.ModelAdmin):
     list_display = ["name","mobile_no"] 
-admin.site.register(AnmDetails, AnmDetailsAdmin)
+admin.site.register(AnmDetails)
 
 class PatientAdmin(admin.ModelAdmin):
     list_display = ["name","mobile_no"]
@@ -20,9 +20,8 @@ class PatientAdmin(admin.ModelAdmin):
 admin.site.register(Patient,PatientAdmin)
 
 class VaccineDetailsAdmin(admin.ModelAdmin):
-    list_display= ["patient","vaccination"]
+    list_display= ["patient"]
 admin.site.register(VaccinationRecord,VaccineDetailsAdmin)
-
 admin.site.register(VaccineDetails)
 
 class VaccineAdmin(admin.ModelAdmin):

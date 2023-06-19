@@ -19,7 +19,7 @@ def index(request):
 
 class VaccinatedPatientsCountAPIView(APIView):
     def get(self, request):
-        vaccinated_count = VaccineCenter.objects.annotate(count=Count('vaccinationrecord__patient')).values('district_name', 'count')
+        vaccinated_count = Patient.objects.annotate(count=Count('vaccinationrecord__patient')).values('district_name', 'count')
 
         serializer = VaccinatedPatientsCountSerializer(vaccinated_count, many=True)
 
@@ -47,7 +47,7 @@ from django.http import JsonResponse
 
 class DistrictPatientCountAPIView(APIView):
     def get(self, request):
-        district_count = VaccineCenter.objects.values('district_name').annotate(patient_count=Count('vaccinationrecord__patient'))
+        district_count = Patient.objects.values('district_name').annotate(patient_count=Count('vaccinationrecord__patient', distinct=True))
 
         serializer = DistrictPatientCountSerializer(district_count, many=True)
 
