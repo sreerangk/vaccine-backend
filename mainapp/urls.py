@@ -1,13 +1,13 @@
 from django.urls import path
 from . import views
-from .views import DistrictPatientCountAPIView,MissedVaccineCountByVillageAPIView, VaccinewiseVaccinatedCountAPIView, MonthwiseVaccinatedCountAPIView, VaccinatedPatientsCountAPIView
+from .views import VaccineStatusAPIView,MissedVaccineCountByVillageAPIView, VaccinewiseVaccinatedCountAPIView, MonthwiseVaccinatedCountAPIView, VaccinatedChildCountAPIView
 app_name = 'mainapp'
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path('vaccinated-patients-count/', VaccinatedPatientsCountAPIView.as_view(), name='vaccinated-patients-count'),
+    path('vaccinated-child-count/', VaccinatedChildCountAPIView.as_view(), name='vaccinated-child-count'),
     path('monthwise-vaccinated-count/', MonthwiseVaccinatedCountAPIView.as_view(), name='monthwise-vaccinated-count'),
     path('vaccinated-count/', VaccinewiseVaccinatedCountAPIView.as_view(), name='vaccinated-count'),
-    path('vaccinated-Distr-count/', DistrictPatientCountAPIView.as_view(), name='vaccinated-patients-count'),
-    path('vaccinated',MissedVaccineCountByVillageAPIView.as_view(), name="vaccinated"),
+    path('missvaccinated',MissedVaccineCountByVillageAPIView.as_view(), name="vaccinated"),
+    path('vaccinestatus',VaccineStatusAPIView.as_view(), name="vaccinestatus"),
 ]

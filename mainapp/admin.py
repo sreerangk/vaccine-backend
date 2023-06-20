@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from mainapp.models import AshaWorker, VaccineCenter,AnmDetails,Patient,VaccinationRecord,VaccineDetails,Vaccine
+from mainapp.models import AshaWorker, VaccineCenter,AnmDetails,Child,VaccinationRecord,VaccineDetails,Vaccine
 
 # Register your models here.
 
@@ -14,14 +14,13 @@ class AnmDetailsAdmin(admin.ModelAdmin):
     list_display = ["name","mobile_no"] 
 admin.site.register(AnmDetails)
 
-class PatientAdmin(admin.ModelAdmin):
-    list_display = ["name","mobile_no"]
+class ChildAdmin(admin.ModelAdmin):
+    list_display = ["name","district_name",]
    
-admin.site.register(Patient,PatientAdmin)
+admin.site.register(Child,ChildAdmin)
 
-class VaccineDetailsAdmin(admin.ModelAdmin):
-    list_display= ["patient"]
-admin.site.register(VaccinationRecord,VaccineDetailsAdmin)
+  
+admin.site.register(VaccinationRecord)
 admin.site.register(VaccineDetails)
 
 class VaccineAdmin(admin.ModelAdmin):

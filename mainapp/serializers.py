@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from mainapp.models import VaccinationRecord, VaccineCenter
+from mainapp.models import Child, VaccinationRecord, VaccineCenter
 
 class VaccinewiseVaccinatedCountSerializer(serializers.Serializer):
     vaccine = serializers.CharField(source='vaccination__vaccine_name')
@@ -10,14 +10,12 @@ class MonthwiseVaccinatedCountSerializer(serializers.Serializer):
     year = serializers.IntegerField()
     month = serializers.IntegerField()
     count = serializers.IntegerField()
-    
-class VaccinatedPatientsCountSerializer(serializers.Serializer):
-    district_name = serializers.CharField()
-    count = serializers.IntegerField()
-    
-class DistrictPatientCountSerializer(serializers.Serializer):
-    district_name = serializers.CharField()
-    patient_count = serializers.IntegerField()
+
+
+class VaccinatedChildCountSerializer(serializers.Serializer):
+    child__district_name = serializers.CharField()
+    child_count = serializers.IntegerField()
+
     
 class VaccineCenterSerializer(serializers.ModelSerializer):
     missed_count = serializers.SerializerMethodField()

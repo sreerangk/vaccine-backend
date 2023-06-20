@@ -32,10 +32,14 @@ class AnmDetails(models.Model):
     def __str__(self):
         return self.name
 
-class Patient(models.Model):
+class Child(models.Model):
     name = models.CharField(max_length=255)
     Age = models.IntegerField()
-    Gender = models.CharField(max_length=255)
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     date_of_birth = models.DateField()
     parent_name = models.CharField(max_length=255)
     district_name = models.CharField(max_length=255)
@@ -45,18 +49,9 @@ class Patient(models.Model):
     def __str__(self):
         return self.name
 
-# class VaccinationRecord(models.Model):
-#     patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
-#     date_administered = models.DateField()
-#     asha_worker = models.ForeignKey(AshaWorker, on_delete=models.CASCADE)
-#     anm_worker = models.ForeignKey(AnmDetails, on_delete=models.CASCADE)
-#     vaccine_center = models.ForeignKey(VaccineCenter, on_delete=models.CASCADE)
 
-    
-#     class Meta:
-#         unique_together = ['patient']
 class VaccinationRecord(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    child = models.ForeignKey(Child, on_delete=models.CASCADE)
     asha_worker = models.ForeignKey(AshaWorker, on_delete=models.CASCADE)
     anm_worker = models.ForeignKey(AnmDetails, on_delete=models.CASCADE)
     vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE)
@@ -65,7 +60,7 @@ class VaccinationRecord(models.Model):
     date_administered = models.DateField()
 
     def __str__(self):
-        return f"{self.patient} - {self.vaccine}"
+        return f"{self.child} - {self.vaccine}"
 
 
 
