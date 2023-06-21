@@ -19,6 +19,25 @@ def index(request):
     return HttpResponse("Server is up!!")
 
 
+class TotalVaccinatedCountAPIView(APIView):
+    def get(self, request):
+        vaccinated_count = VaccinationRecord.objects.values('child').distinct().count()
+
+        return Response({'vaccinated_count': vaccinated_count})
+    
+class TotalChildCountAPIView(APIView):
+    def get(self, request):
+        vaccinated_count = Child.objects.distinct().count()
+
+        return Response({'vaccinated_count': vaccinated_count})
+    
+class TotalNotVaccinatedCountAPIView(APIView):
+    def get(self, request):
+        total_count = Child.objects.count()
+        vaccinated_count = VaccinationRecord.objects.values('child').distinct().count()
+        not_vaccinated_count = total_count - vaccinated_count
+
+        return Response({'not_vaccinated_count': not_vaccinated_count})
 
 class VaccinatedChildCountAPIView(APIView):
     def get(self, request):
@@ -55,8 +74,7 @@ class VaccinewiseVaccinatedCountAPIView(APIView):
 
         return Response(response_data)
 
-
-
+    
 class MissedVaccineCountByVillageAPIView(APIView):
     def get(self, request, format=None):
         subquery = VaccinationRecord.objects.filter(vaccine_center=OuterRef('pk')).values('vaccine_center')
