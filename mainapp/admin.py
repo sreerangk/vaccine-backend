@@ -3,7 +3,7 @@ from django.contrib import admin
 from mainapp.models import AshaWorker, VaccineCenter,AnmDetails,Child,VaccinationRecord,VaccineDetails,Vaccine
 from import_export.admin import ImportExportModelAdmin
 
-from .resources import childmodel,VaccinationRecordResource
+from .resources import ChildModelResource,VaccinationRecordResource
 # Register your models here.
 
 admin.site.register(VaccineCenter)
@@ -36,7 +36,7 @@ admin.site.register(Vaccine, VaccineAdmin)
 @admin.register(Child)
 class ChildAdmin(ImportExportModelAdmin):
     list_display = ["name","child_mpid",]
-    resource_class = childmodel
+    resource_class = ChildModelResource
     
 
 @admin.register(VaccinationRecord)
