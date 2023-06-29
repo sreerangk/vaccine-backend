@@ -116,6 +116,7 @@ class VaccinationRecordResource(resources.ModelResource):
         model = VaccinationRecord
         skip_unchanged = True
         report_skipped = False
+        
 
     def before_import_row(self, row, **kwargs):
         child_id = row['child_id']  # Modify according to your column name in the import file
@@ -131,12 +132,19 @@ class VaccinationRecordResource(resources.ModelResource):
             try:
                 vaccine = Vaccine.objects.get(vaccine_name=column_name)
                 date_administered = value
-
+                anm_name = row.get('anm_name')  # Modify according to your column name in the import file
+                anm_mobile_no = row.get('anm_mobile_no')  # Modify according to your column name in the import file
+                asha_mobile = row.get('asha_mobile')
+                asha_worker = row.get('asha_worker')
                 # Create a new VaccinationRecord instance with the data
                 vaccination_record = VaccinationRecord(
                     child_id=child,
                     vaccine=vaccine,
-                    date_administered=date_administered
+                    date_administered=date_administered,
+                    anm_name=anm_name,
+                    anm_mobile_no=anm_mobile_no,
+                    asha_mobile=asha_mobile,
+                    asha_worker=asha_worker,
                 )
 
                 # Save the VaccinationRecord instance

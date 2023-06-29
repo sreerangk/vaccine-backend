@@ -26,7 +26,6 @@ from .resources import ChildModelResource,VaccinationRecordResource
 # admin.site.register(VaccineDetails)
 
 class VaccineAdmin(admin.ModelAdmin):
-    
     def __str__(self):
         return self.vaccine_name
 admin.site.register(Vaccine, VaccineAdmin)

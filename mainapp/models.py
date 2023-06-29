@@ -94,9 +94,10 @@ class Vaccine(models.Model):
     vaccine_name = models.CharField(max_length=255, unique=True, primary_key=True)
 
 class VaccinationRecord(models.Model):
-    child_id = models.ForeignKey(Child, on_delete=models.CASCADE,to_field='child_id',null=True, blank=True)
+    child_id = models.ForeignKey(Child, on_delete=models.CASCADE,to_field='child_id')
     vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE, to_field='vaccine_name',null=True, blank=True)
     date_administered = models.CharField(max_length=255)
     anm_name = models.CharField(max_length=255, null=True, blank=True)
     anm_mobile_no = models.CharField(max_length=255, null=True, blank=True)
-   
+    asha_worker = models.CharField(max_length=255, null=True, blank=True)
+    asha_mobile = models.CharField(max_length=255, null=True, blank=True)
