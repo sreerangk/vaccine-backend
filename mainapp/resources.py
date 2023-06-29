@@ -107,99 +107,56 @@ from .models import Child, Vaccine, VaccinationRecord
 #         fields = ['id','child_id', 'date_administered', 'anm_name', 'anm_mobile_no']
 from import_export import resources, fields, widgets
 from .models import Child, Vaccine, VaccinationRecord
+from import_export import resources
+from tablib import Dataset
 
+from .models import Vaccine, VaccinationRecord, Child
 class VaccinationRecordResource(resources.ModelResource):
-    child_id = fields.Field(
-        column_name='child_id',
-        attribute='child_id',
-        widget=widgets.ForeignKeyWidget(Child, 'child_id')
-    )
-    date_administered = fields.Field(column_name='date_administered', attribute='date_administered')
-    anm_name = fields.Field(column_name='anm_name', attribute='anm_name')
-    anm_mobile_no = fields.Field(column_name='anm_mobile_no', attribute='anm_mobile_no')
-
-    # Mapping of column names to vaccine names
-    COLUMN_MAPPING = {
-        'bcg': 'bcg',
-        'opv0': 'opv0',
-        'opv1': 'opv1',
-        'opv2': 'opv2',
-        'opv3': 'opv3',
-        'opvB':'opvB',
-        'dpt1': 'dpt1',
-        'dpt2': 'dpt2',
-        'dpt3': 'dpt3',
-        'dptB1': 'dptB1',
-        'dptB2': 'dptB2',
-        'hepB0': 'hepB0',
-        'hepB1': 'hepB1',
-        'hepB2': 'hepB2',
-        'hepB3': 'hepB3',
-        'pentavalentVaccine1': 'pentavalentVaccine1',
-        'pentavalentVaccine2': 'pentavalentVaccine2',
-        'pentavalentVaccine3': 'pentavalentVaccine3',
-        'measles1': 'measles1',
-        'measles2': 'measles2',
-        'jevaccine1': 'jevaccine1',
-        'jevaccine2': 'jevaccine2',
-        'vitaminA1': 'vitaminA1',
-        'vitaminA2': 'vitaminA2',
-        'vitaminA3': 'vitaminA3',
-        'vitaminA4': 'vitaminA4',
-        'vitaminA5': 'vitaminA5',
-        'vitaminA6': 'vitaminA6',
-        'vitaminA7': 'vitaminA7',
-        'vitaminA8': 'vitaminA8',
-        'vitaminA9': 'vitaminA9',
-        'mr2': 'mr2',
-        'rotA1': 'rotA1',
-        'rotA2': 'rotA2',
-        'rotA3': 'rotA3',
-        'ivp1': 'ivp1',
-        'ivp2': 'ivp2',
-        'albendazol': 'albendazol',
-        'pcv2': 'pcv2',
-        'pcvBooster': 'pcvBooster',
-        'mr1': 'mr1',
-        # Add more mappings as needed
-    }
-
-    def before_import_row(self, row, **kwargs):
-        child_id = row.get('child_id')
-        vaccines_data = {column_name: row.get(column_name) for column_name in self.COLUMN_MAPPING.keys()}
-
-        # Check if all vaccine-related fields are empty
-        if all(value in [None, 'NULL'] for value in vaccines_data.values()):
-            return
-
-        # Iterate over the column mapping and create vaccination records
-        for column_name, vaccine_name in self.COLUMN_MAPPING.items():
-            if vaccines_data[column_name] and vaccines_data[column_name] != 'NULL':
-                try:
-                    vaccine = Vaccine.objects.get(vaccine_name=vaccine_name)
-                except Vaccine.DoesNotExist:
-                    continue
-
-                child = Child.objects.get(child_id=child_id)
-                date_administered = row[column_name]
-
-                # Skip saving the record if date_administered is null
-                if date_administered in [None, 'NULL']:
-                    continue
-
-                # Skip saving the record if vaccine is null
-                if vaccine is None:
-                    continue
-
-                VaccinationRecord.objects.create(
-                    child_id=child,
-                    vaccine=vaccine,
-                    date_administered=date_administered,
-                    anm_name=row.get('anm_name'),
-                    anm_mobile_no=row.get('anm_mobile_no')
-                )
-
-
     class Meta:
         model = VaccinationRecord
-        fields = ['id','child_id', 'date_administered', 'anm_name', 'anm_mobile_no']
+        skip_unchanged = True
+        report_skipped = False
+
+    def before_import_row(self, row, **kwargs):
+        child_id = row['child_id']  # Modify according to your column name in the import file
+        child = Child.objects.get(child_id=child_id)
+
+        # Iterate over the columns dynamically
+        for column_name, value in row.items():
+            # Skip if the value is NULL or empty
+            if value is None or value == 'NULL' or value == '':
+                continue
+                
+            # Check if the column corresponds to a vaccine name
+            try:
+                vaccine = Vaccine.objects.get(vaccine_name=column_name)
+                date_administered = value
+
+                # Create a new VaccinationRecord instance with the data
+                vaccination_record = VaccinationRecord(
+                    child_id=child,
+                    vaccine=vaccine,
+                    date_administered=date_administered
+                )
+
+                # Save the VaccinationRecord instance
+                vaccination_record.save()
+
+            except Vaccine.DoesNotExist:
+                continue
+
+    def after_import(self, dataset: Dataset, result, using_transactions, dry_run, **kwargs):
+        imported_data = dataset.dict  # Convert the dataset to a dictionary
+
+        # Get the vaccine names from the Vaccine table
+        vaccine_names = set(Vaccine.objects.values_list('vaccine_name', flat=True))
+
+        # Get the imported child_ids
+        imported_child_ids = {row['child_id'] for row in imported_data if 'child_id' in row}
+
+        # Query the VaccinationRecord objects to delete
+        invalid_records = VaccinationRecord.objects.exclude(vaccine__vaccine_name__in=vaccine_names) \
+            .filter(child_id__in=imported_child_ids)
+
+        # Delete the invalid VaccinationRecord objects
+        invalid_records.delete()
